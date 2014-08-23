@@ -4,7 +4,29 @@ be inspired by https://metacpan.org/release/Cache-Scalar-WithExpiry
 
 ## SYNOPSIS
 
-TODO
+```go
+package main
+
+import (
+	"log"
+	"time"
+
+	"github.com/hisaichi5518/vache"
+)
+
+func main() {
+	vache.Set("key", "val", time.Second)
+	v := vache.Get("key")
+	log.Print(v) #=> 2014/08/23 19:58:22 val
+
+	time.Sleep(2 * time.Second)
+	v = vache.Get("key")
+	if v == "" {
+		v = "not found"
+	}
+	log.Print(v) #=> 2014/08/23 19:58:24 not found
+}
+```
 
 ## Install
 
