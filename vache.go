@@ -8,7 +8,7 @@ func Set(key string, val string, expire time.Duration) {
 	cache[key] = val
 
 	time.AfterFunc(expire, func() {
-		cache[key] = ""
+		delete(cache, key)
 	})
 }
 
@@ -26,5 +26,12 @@ func GetOrSet(key string, code func() (string, time.Duration)) string {
 	var expire time.Duration
 	v, expire = code()
 	Set(key, v, expire)
+	return v
+}
+
+func Delete(key string) string {
+	v := Get(key)
+	delete(cache, key)
+
 	return v
 }

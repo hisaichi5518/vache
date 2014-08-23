@@ -59,3 +59,15 @@ func TestGetOrSet(t *testing.T) {
 		t.Fatal("not expired")
 	}
 }
+
+func TestDelete(t *testing.T) {
+	Set("name", "hisaichi5518", 10*time.Second)
+	if v := Get("name"); v == "" {
+		t.Fatal("not set")
+	}
+
+	Delete("name")
+	if v := Get("name"); v != "" {
+		t.Fatal("not delete")
+	}
+}
