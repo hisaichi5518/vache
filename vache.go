@@ -16,3 +16,15 @@ func Get(key string) string {
 	cacheData := cache[key]
 	return cacheData
 }
+
+func GetOrSet(key string, code func() (string, time.Duration)) string {
+	v := Get(key)
+	if v != "" {
+		return v
+	}
+
+	var expire time.Duration
+	v, expire = code()
+	Set(key, v, expire)
+	return v
+}
