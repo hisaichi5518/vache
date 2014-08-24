@@ -10,21 +10,21 @@ func TestSetAndGet(t *testing.T) {
 	Set("key2", "val2", time.Second)
 
 	// found cache.
-	v := Get("key1")
+	v, _ := Get("key1")
 	if v != "val1" {
 		t.Fatal("not set")
 	}
 	time.Sleep(2 * time.Second)
 
 	// expired. so, not found cache.
-	v = Get("key1")
+	v, _ = Get("key1")
 	if v != "" {
 		t.Fatal("not expired!")
 	}
 }
 
 func TestValueIsNotFound(t *testing.T) {
-	v := Get("not-found")
+	v, _ := Get("not-found")
 	if v != "" {
 		t.Fatal("found 'not-found-key's cache.")
 	}
@@ -32,19 +32,19 @@ func TestValueIsNotFound(t *testing.T) {
 
 func TestGetOrSet(t *testing.T) {
 	key := "get_or_set"
-	v := Get(key)
+	v, _ := Get(key)
 	if v != "" {
 		t.Fatal("found 'get_or_set's cache.")
 	}
 
-	value := GetOrSet(key, func() (string, time.Duration) {
+	value, _ := GetOrSet(key, func() (string, time.Duration) {
 		return "value1", time.Second
 	})
 	if value != "value1" {
 		t.Fatal("not set")
 	}
 
-	value = GetOrSet(key, func() (string, time.Duration) {
+	value, _ = GetOrSet(key, func() (string, time.Duration) {
 		return "value2", time.Second
 	})
 	if value == "value2" {
@@ -54,7 +54,7 @@ func TestGetOrSet(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// expired. so, not found cache.
-	value = Get(key)
+	value, _ = Get(key)
 	if value != "" {
 		t.Fatal("not expired")
 	}
@@ -62,12 +62,38 @@ func TestGetOrSet(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	Set("name", "hisaichi5518", 10*time.Second)
-	if v := Get("name"); v == "" {
+	if v, _ := Get("name"); v == "" {
 		t.Fatal("not set")
 	}
 
 	Delete("name")
-	if v := Get("name"); v != "" {
+	if v, _ := Get("name"); v != "" {
 		t.Fatal("not delete")
 	}
+}
+
+func TestLock(t *testing.T) {
+	Set("name", "hisaichi5518", 10*time.Second)
+
+	go func() {
+		v, _ := Get("name")
+		if v != "hisaichi5518" {
+			t.Fatal("not get")
+		}
+	}()
+	go func() {
+		v, _ := Get("name")
+		if v != "hisaichi5518" {
+			t.Fatal("not get")
+		}
+	}()
+	go Delete("name")
+	go Set("name", "hisaichi5518", 10*time.Second)
+	go func() {
+		v, _ := Get("name")
+		if v != "hisaichi5518" {
+			t.Fatal("not get")
+		}
+	}()
+	time.Sleep(10 * time.Second)
 }
