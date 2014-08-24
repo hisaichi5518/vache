@@ -16,15 +16,18 @@ import (
 
 func main() {
 	vache.Set("key", "val", time.Second)
-	v := vache.Get("key")
-	log.Print(v) //=> 2014/08/23 19:58:22 val
+	v, ok := vache.Get("key")
+	log.Println(v)  //=> 2014/08/23 19:58:22 val  <= Having Cache!
+	log.Println(ok) //=> 2014/08/23 19:58:22 true <= Having Cache!
 
+    // Wait for expire..
 	time.Sleep(2 * time.Second)
-	v = vache.Get("key")
-	if v == "" {
+	v, ok = vache.Get("key")
+	if !ok {
 		v = "not found"
 	}
-	log.Print(v) //=> 2014/08/23 19:58:24 not found
+	log.Println(v)  //=> 2014/08/23 19:58:24 not found <= Deleted!
+	log.Println(ok) //=> 2014/08/23 19:58:24 false     <= Deleted!
 }
 ```
 
